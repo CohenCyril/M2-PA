@@ -6,11 +6,11 @@
 
 { lib, mkRocqDerivation, which, rocq-core, rocqnavi
   ## declare extra dependencies here, to be used in propagateBuildInputs e.g.
-  , mathcomp, rocq-elpi, coqPackages, mathcomp-analysis 
+  , mathcomp, rocq-elpi, mathcomp-analysis, deriving, equations, mathcomp-zify
   , version ? null }:
 
 with lib; mkRocqDerivation {
-  pname = "M1-PP-2026-2027";
+  pname = "M2-PA";
   ## you can configure the domain, owner and repository, the default are:
   # repo = "lip-ssr-tuto";
   owner = "CohenCyril";
@@ -40,8 +40,10 @@ with lib; mkRocqDerivation {
   ## - arbitrary nix packages (you need to require them at the beginning of the file)
   ## - Coq packages (require them at the beginning of the file)
   ## - OCaml packages (use `coq.ocamlPackages.xxx`, no need to require them at the beginning of the file)
-  propagatedBuildInputs = [ mathcomp rocq-elpi coqPackages.mathcomp-algebra-tactics
-    mathcomp-analysis coqPackages.mathcomp-zify rocqnavi ]; ## e.g. `= [ mathcomp coq-elpi ]`
+  propagatedBuildInputs = [
+    rocq-elpi mathcomp mathcomp-analysis rocqnavi
+    mathcomp-zify
+  ]; ## e.g. `= [ mathcomp coq-elpi ]`
 
   ## Does the package contain OCaml code?
   # mlPlugin = false;

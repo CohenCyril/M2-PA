@@ -1,16 +1,16 @@
 ---
-fullname: AI Days @ ENSL -- Rocq Tutorial
-shortname: m1-pp-2026-2027
+fullname: M2 CR05 Proof Assistants 2026-2027 -- Rocq Tutorial
+shortname: M2-PA-2026-2027
 organization: CohenCyril
 community: false
 action: false
 coqdoc: false
 
 synopsis: >-
-  A [tutorial](theories/tutorial.v) for AI Days @ ENS de Lyon
+  A [Rocq tutorial](theories/tutorial.v) for Proof Assistant Seminar 2026-2027
 
 description: |-
-  A [tutorial](theories/tutorial.v) for AI Days @ ENS de Lyon
+  A [Rocq tutorial](theories/tutorial.v) for Proof Assistant Seminar 2026-2027
 
 authors:
 - name: Cyril Cohen
@@ -30,31 +30,23 @@ license:
   file: LICENSE
 
 supported_rocq_versions:
-  text: "9.1"
-  opam: '{= "9.1.1"}'
+  text: "9.2"
+  opam: '{= "9.2.0"}'
 
 tested_rocq_opam_versions:
-- version: '9.1.1'
+- version: '9.2.0'
 
 dependencies:
 - opam:
     name: rocq-mathcomp-character
-    version: '{= "2.5.0"}'
-  description: Mathematical components version 2.5.0
-- opam:
-    name: coq-mathcomp-algebra-tactics
-    version: '{= "1.2.7"}'
-  description: Mathematical components algebra tactics 1.2.7
-- opam:
-    name: coq-mathcomp-zify
-    version: '{= "1.6.0+2.0+8.18"}'
-  description: Mathematical components zify plugin 1.6.0+2.0+8.18
+    version: '{= "2.6.0"}'
+  description: Mathematical components version 2.6.0
 - opam:
     name: rocq-mathcomp-analysis
-    version: '{= "1.16.0"}'
-  description: Mathematical components analysis library 1.16.0
+    version: '{= "1.19.0"}'
+  description: Mathematical components analysis library 1.19.0
 
-namespace: AIDaysENSL 
+namespace: M2PA 
 
 keywords:
 - name: tutorial
@@ -104,7 +96,7 @@ build: |-
   You can now run your favorite editor, you **do not need** to install your
   favorite language server (they are included in the shell)
 
-  #### Using docker (warning, the image is > 17GB)
+  #### Using docker (warning, the image is > 4GB)
 
   You need to [install docker](https://docs.docker.com/engine/install/).
 

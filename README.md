@@ -2,14 +2,14 @@
 This file was generated from `meta.yml`, please do not edit manually.
 Follow the instructions on https://github.com/coq-community/templates to regenerate.
 --->
-# AI Days @ ENSL -- Rocq Tutorial
+# M2 CR05 Proof Assistants 2026-2027 -- Rocq Tutorial
 
 
 
 
 
 
-A [tutorial](theories/tutorial.v) for AI Days @ ENS de Lyon
+A [Rocq tutorial](theories/tutorial.v) for Proof Assistant Seminar 2026-2027
 
 ## Meta
 
@@ -17,11 +17,9 @@ A [tutorial](theories/tutorial.v) for AI Days @ ENS de Lyon
   - Cyril Cohen (initial)
 - License: [GNU Lesser General Public License v2.1](LICENSE)
 - Additional dependencies:
-  - Mathematical components version 2.5.0
-  - Mathematical components algebra tactics 1.2.7
-  - Mathematical components zify plugin 1.6.0+2.0+8.18
-  - Mathematical components analysis library 1.16.0
-- Rocq/Coq namespace: `AIDaysENSL`
+  - Mathematical components version 2.6.0
+  - Mathematical components analysis library 1.19.0
+- Rocq/Coq namespace: `M2PA`
 - Related publication(s): none
 
 ## Building and installation instructions
@@ -62,7 +60,7 @@ make
 You can now run your favorite editor, you **do not need** to install your
 favorite language server (they are included in the shell)
 
-#### Using docker (warning, the image is > 17GB)
+#### Using docker (warning, the image is > 4GB)
 
 You need to [install docker](https://docs.docker.com/engine/install/).
 

@@ -5,23 +5,21 @@ opam-version: "2.0"
 maintainer: "Cyril Cohen <cyril.cohen@inria.fr>"
 version: "dev"
 
-homepage: "https://github.com/CohenCyril/m1-pp-2026-2027"
-dev-repo: "git+https://github.com/CohenCyril/m1-pp-2026-2027.git"
-bug-reports: "https://github.com/CohenCyril/m1-pp-2026-2027/issues"
+homepage: "https://github.com/CohenCyril/M2-PA-2026-2027"
+dev-repo: "git+https://github.com/CohenCyril/M2-PA-2026-2027.git"
+bug-reports: "https://github.com/CohenCyril/M2-PA-2026-2027/issues"
 license: "LGPL-2.1-or-later"
 
-synopsis: "A [tutorial](theories/tutorial.v) for AI Days @ ENS de Lyon"
+synopsis: "A [Rocq tutorial](theories/tutorial.v) for Proof Assistant Seminar 2026-2027"
 description: """
-A [tutorial](theories/tutorial.v) for AI Days @ ENS de Lyon"""
+A [Rocq tutorial](theories/tutorial.v) for Proof Assistant Seminar 2026-2027"""
 
 build: [make "-j%{jobs}%"]
 install: [make "install"]
 depends: [
   "coq" 
-  "rocq-mathcomp-character" {= "2.5.0"}
-  "coq-mathcomp-algebra-tactics" {= "1.2.7"}
-  "coq-mathcomp-zify" {= "1.6.0+2.0+8.18"}
-  "rocq-mathcomp-analysis" {= "1.16.0"}
+  "rocq-mathcomp-character" {= "2.6.0"}
+  "rocq-mathcomp-analysis" {= "1.19.0"}
 ]
 
 tags: [
@@ -30,7 +28,7 @@ tags: [
   "keyword:tutorial"
   "keyword:ssreflect"
   "keyword:mathcomp"
-  "logpath:AIDaysENSL"
+  "logpath:M2PA"
 ]
 authors: [
   "Cyril Cohen"

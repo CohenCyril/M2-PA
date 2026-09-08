@@ -1,6 +1,6 @@
 {
-    "name": "aidaysensl",
-    "image": "cohencyril/aidaysensl",
+    "name": "pa-seminar-rocq-tuto",
+    "image": "cohencyril/pa-seminar-rocq-tuto",
     "postAttachCommand": "make -j8 -k",
     "customizations": {
         "vscode": {

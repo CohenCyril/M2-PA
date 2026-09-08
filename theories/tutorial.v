@@ -20,8 +20,6 @@ What you need installed (via opam, in one switch):
 - rocq-stdlib 9.0.0          (the Rocq "standard library")
 - mathcomp                   (rocq-mathcomp-ssreflect, -algebra, -field)
 - mathcomp-analysis          (rocq-mathcomp-analysis, -classical)
-- mathcomp-algebra-tactics   (gives `ring`, `field`, `lra`, `nra`)
-- mathcomp-zify / mczify     (makes `lia`/`nia` understand nat & int)
 *)
 
 (**md
@@ -52,7 +50,16 @@ The sole purpose of Rocq's kernel is to check assertions of the form
 - `fun n : nat => 1 + n` is a term, a function of type `nat -> nat`,
   i.e. `(fun n => 1 + n) : nat -> nat`.
 - `forall n : nat, n = n` is a term, a "proposition", of type `Prop`.
+*)
 
+Check 42.
+Check nat.
+Check Type.
+Check fun n => n.
+Check forall n : nat, n = n.
+Check fun n : nat => eq_refl n.
+
+(**  md
 ### Propositions
 The type `Prop` of propositions is itself a term, of type `Type@{1}`; and a
 proposition `P` (of type `Prop`) is also a type. A proposition holds if and
@@ -76,7 +83,20 @@ only if it is inhabited. For example, `forall n : nat, n = n` holds because
 - `~ A` is a proposition, defined as `A -> False`. A proof of `~ A` turns any
   inhabitant of `A` into a proof of `False`, so `~ A` holds exactly when `A`
   has no inhabitant.
+*)
 
+Check True.
+Check I.
+Check False.
+Print True.
+Print not.
+Section Propositions.
+  Variables (T : Type) (P Q : Prop) (R : T -> Prop).
+  Check P /\ Q.
+  Check forall a, R a.
+End Propositions.
+
+(**md
 ## Contexts
 
 Some terms do not make sense by themselves: e.g. `n = n` cannot be
@@ -92,12 +112,27 @@ we write `Γ ⊢ t : A` to mean "`t` has type `A` in context `Γ`".
   indeed `(n : nat) ⊢ (n = n) : Prop` holds.
 - if `Γ ⊢ A : Type` holds, one can extend `Γ` with a variable of type `A`,
   and `Γ, x : A` is a valid context such that `(Γ, x : A) ⊢ x : A` holds.
+ *)
 
+(* Section one_variable_context. *)
+(*   Variable (n : nat). *)
+(*   Check n. *)
+(**md
 ## Definitions, lemmas and goals
 
 The main interaction loop of Rocq provides assistance to write definitions,
 state lemmas, and prove them.
+ *)
 
+Definition forty_two : nat := 42.
+Lemma nat_refl : forall n : nat, n = n.
+Proof.
+  intro n.
+  reflexivity.
+Qed.
+Print nat_refl.
+
+(**md
 Declaring a definition `d` of type `A` consists in giving a name to a closed
 term of type `A`.
 
@@ -126,7 +161,18 @@ For example:
 reads: "assuming natural numbers `m` and `n` and a proof `eq_m_n` that
 `n = m`, provide a proof term for `m = n`", or: "fill `?t` such that
 `n : nat, m : nat, eq_m_n : n = m ⊢ ?t : m = n` holds".
+ *)
+Require Import ssreflect.
+Lemma eq_sym : forall m n : nat, m = n -> n = m.
+Proof.
+move=> m.
+move=> n.
+move=> eq_mn.
+rewrite eq_mn.
+reflexivity.
+Qed.
 
+(*md
 ## Proof terms vs scripts
 
 There are two ways to produce the proof term that the kernel will check.
@@ -162,7 +208,7 @@ bookkeeping.)
   goal is `B`, then `apply: thm` reduces the goal to `A`. This is modus
   ponens read backwards, the workhorse of structured proof. We use the
   SSReflect form `apply: thm`.
-- `exact: thm` is an `apply: thm` that must close the goal.
+- `exact: thm` is `by apply: thm` that must close the goal.
 - `apply/equiv` uses an equivalence `equiv` (stated as `<->` or `reflect`)
   from left to right, or if it fails, from right to left.
 - `rewrite`: substitutes with equalities. If `e : a = b` then `rewrite e`
@@ -216,7 +262,7 @@ tactics, and knowing their theoretical limit is of essence.
 - `psatz n`: Positivstellensatz certificates up to degree `n`; prove
   polynomial *inequalities* when a certificate exists.
 
-*Ring / field equations* (mathcomp-algebra-tactics):
+*Ring / field equations* (was in mathcomp-algebra-tactics, now in mathcomp 2.6.0):
 - `ring`: decides equalities in any commutative ring/semiring (`comRingType`):
   refies, normalise, compare. Complete for the equational theory of
   commutative semirings.
@@ -260,14 +306,14 @@ From now on, read the explanations, and when you are ready:
 erase the proofs and try to do them again.
 You can also play with alternative ways you may have in mind
 to prove statements.
-*)
+**)
 
 
 (*md
 # SECTION 2.  Loading the library, and a first proof
 *)
 
-From mathcomp Require Import all_boot.
+From mathcomp Require Import boot.
 
 (*md
  `all_boot` gives us the SSReflect tactic language, `nat`, sequences,
@@ -308,9 +354,9 @@ Qed.
 Goal forall n m : nat, n = 2 * m -> m = 6 -> (n - 5) * m = 42.
 Proof.
 move=> n m nE mE.
-rewrite nE.      (* use n = 2 * m *)
-rewrite mE.      (* use m = 6 *)
-by [].           (* the goal is now a closed arithmetic identity *)
+rewrite mE in nE *.
+rewrite nE.
+by [].
 Qed.
 
 (*md
@@ -334,8 +380,8 @@ forms are worth distinguishing.
 - `apply/equiv` uses an equivalence `equiv` (stated as `<->` or `reflect`)
   from left to right, or if it fails, from right to left.
 
-`exact: thm` is an `apply: thm` that is required to finish the goal outright,
-with no premise left over.
+`exact: thm` is defined as `by apply: thm` using the finisher `by` after applying
+the theorem: that is required to finish the goal with no premise left over.
 *)
 
 (* (A -> B -> C) <-> (A /\ B -> C) *)
@@ -343,9 +389,7 @@ with no premise left over.
 Goal forall n m : nat, n <= m -> n <= m + 1.
 Proof.
 move=> n m nm.
-have h := @leq_trans m.
-apply: h.
-  by [].
+apply: (leq_trans nm).
 by apply: leq_addr.
 (* Search (_ <= _ + _). *)
 (* apply: (@leq_trans m). *)
@@ -355,12 +399,15 @@ by apply: leq_addr.
 (* (* exactly one premise is left: `m <= m + 1` *) *)
 (* exact: leq_addr.   (* `leq_addr : m <= m + n`, here with n := 1 *) *)
 Qed.
-
+(* Search (_ + _ + _). *)
+(* Search addn associative. *)
+Search "C" addn.
 (*md
  Discoverability. You will not memorise the library. `Search` finds lemmas
    by name fragment and/or by a pattern with holes `_`. For instance:
        Search (_ + _) (_ <= _).
        Search "addn" "C".     (* names containing addn and C: addnC, ... *)
+   `Locate "+".` to find the name of the definition behind `+ `.
    `About leq_trans.` prints a lemma's statement; `Print` unfolds a
    definition. *)
 
@@ -382,14 +429,15 @@ Proof. lia. Qed.
    needs commutativity, associativity and cancellation lemmas; `lia` just
    settles it. *)
 Lemma lia_linear (a b c : nat) : a + b + c = c + (b + a).
-Proof. lia. Qed.
+Proof. lia. Time Qed.
 
 (*md
    The same statement done structurally, to see what `lia` spared us. We pick
    the exact subterm to rewrite with an occurrence pattern in [ ... ], one
    step at a time. *)
 Lemma byhand_linear (a b c : nat) : a + b + c = c + (b + a).
-Proof. by rewrite [b + a]addnC [c + _]addnC. Time Qed.
+Proof. 
+by rewrite [b + a]addnC [c + _]addnC. Time Qed.
 
 (*md
    Truncated subtraction on `nat` is a classic `lia` win:
@@ -403,7 +451,7 @@ Proof. lia. Qed.
    `lia` is linear and will refuse it. *)
 Lemma square_of_sum_nat (a b : nat) : (a + b) ^ 2 = a ^ 2 + 2 * a * b + b ^ 2.
 Proof.
-nia.   (* nonlinear, heuristic -- it happens to handle this one *)
+nia.   (* nonlinear, heuristic --  by chance it happens to handle this one *)
 Qed.
 
 (*md
@@ -419,7 +467,7 @@ Qed.
  
 We leave the reach of `lia`/`nia`/`ring`, as soon as we slightly step outside
 arithmetic: quantify over a data structure, or use a higher-order recursion
-combinator. Arithmetic solvers do not recognize a goal shape they know,
+combinator. Arithmetic solvers do not recognize a goal shape they don't know,
 and give up on the statement, yet after an induction and a few rewriting steps
 one can work towards getting leaf subgoals falling back into its scope.
 *)
@@ -480,7 +528,7 @@ Lemma ring_binom : (x + y) ^+ 2 = x ^+ 2 + x * y *+ 2 + y ^+ 2.
 Proof. ring. Qed.
 
 (*md
-   A polynomial identity that would be painful by rewriting; `ring` eats it. *)
+   A polynomial identity that would be painful by rewriting; `ring` solves it. *)
 Lemma ring_cube : (x - y) * (x ^+ 2 + x * y + y ^+ 2) = x ^+ 3 - y ^+ 3.
 Proof. ring. Qed.
 End AlgebraTactics.
@@ -495,8 +543,7 @@ Variable x : F.
 Lemma field_inv : x != 0 -> x / x = 1.
 Proof.
 move=> xn0.
-field.       (* reduces to the nonzero side condition... *)
-exact: xn0.  (* ...which is our hypothesis. *)
+by field.
 Qed.
 End FieldTactic.
 
@@ -509,7 +556,7 @@ Lemma lra_linear : x <= 1 -> y <= 1 -> x + y <= 2.
 Proof. lra. Qed.
 
 (*md
-   A nonlinear inequality: AM-QM style. `lra` is linear and refuses it, but
+   A nonlinear inequality. `lra` is linear and refuses it, but
    `nra` (nonlinear, heuristic) finds the sum-of-squares certificate. *)
 Lemma by_hand_amqm : 0 <= (x - y) ^+ 2.
 Proof. by rewrite sqr_ge0. Qed.
@@ -581,100 +628,6 @@ Admitted. (* Prove me and replace this by Qed *)
    The goal is genuinely nonlinear (it multiplies the variables), so the
    linear solver `lra` is helpless. *)
 
-Section Convexity.
-Local Open Scope ring_scope.
-Variable R : realDomainType.
-
-Lemma convex_sqr (x y t : R) :
-  0 <= t -> t <= 1 ->
-  (t * x + (1 - t) * y) ^+ 2 <= t * x ^+ 2 + (1 - t) * y ^+ 2.
-Proof.
-Fail lra.   (* linear arithmetic cannot: the inequality is genuinely nonlinear *)
-move=> t_gt0 t_le1.
-rewrite -subr_ge0.
-set leRHS := (X in 0 <= X).
-have -> : leRHS = t * (1 - t) * (x - y) ^+ 2 by rewrite /leRHS; ring.
-by rewrite ?(sqr_ge0, mulr_ge0) ?subr_ge0.
-Qed.
-
-End Convexity.
-
-
-
-(*md
-# SECTION 9.  Topology (mathcomp-analysis)
-
-mathcomp-analysis builds point-set topology on filters. A topological space
-carries `open`, `closed`, a neighbourhood filter `nbhs`, and convergence
-`F --> x`. Sets use classical set notation (some operators are
-backtick-delimited):
-```
-    setT        full set            set0        empty set
-    A `&` B     intersection        A `|` B     union
-    f @^-1` A   preimage            `]a, b[`    open interval
-```
-Run`Search` to locate lemmas and browe the library documentation at:
-- https://math-comp.github.io/htmldoc_2_5_0/index.html
-- https://math-comp.github.io/analysis/htmldoc/1_16_0/index.html
-*)
-
-From mathcomp Require Import classical_sets topology normedtype.
-Local Open Scope classical_set_scope.
-
-Section TopologyWarmup.
-Variable T : topologicalType.
-
-(*md
-   The whole space and the empty set are open. These are part of the
-   structure, exposed as named lemmas. `Search open.` lists the toolkit. *)
-Lemma openT_demo : open (setT : set T).
-Proof. exact: openT. Qed.
-
-Lemma open0_demo : open (set0 : set T).
-Proof. exact: open0. Qed.
-
-(*md
-Finite intersections of opens are open. `openI` takes two opens.
-*)
-Lemma openI_demo (A B : set T) : open A -> open B -> open (A `&` B).
-Proof. exact: openI. Qed.
-
-(* The complement of an open is closed:
-   Search closed open (~` _). *)
-Lemma open_closedC_demo (A : set T) : open A -> closed (~` A).
-Proof. exact: open_closedC. Qed.
-End TopologyWarmup.
-
-Section Continuity.
-Variables (T U : topologicalType).
-
-(*md
-   Continuity via preimages. `continuous f` is defined pointwise through
-   filters; `continuousP` is the classical bridge: `f` is continuous iff the
-   preimage of every open is open. We prove the standard corollary that a
-   continuous preimage of an open is open, one step at a time.
-   Search (continuous _) open "P". *)
-Lemma preimage_open_of_continuous (f : T -> U) (A : set U) :
-  continuous f -> open A -> open (f @^-1` A).
-Proof.
-move=> cf.
-apply continuousP.
-by [].
-Qed.
-
-(*md
-   Composition of continuous maps is continuous. We reason at a point `x` and
-   feed the two pointwise continuities to the composition lemma.
-   Search continuous comp. *)
-Lemma continuous_comp_demo (V : topologicalType)
-    (f : T -> U) (g : U -> V) :
-  continuous f -> continuous g -> continuous (g \o f).
-Proof.
-move=> cf cg x.
-exact: continuous_comp (cf x) (cg (f x)).
-Qed.
-End Continuity.
-
 
 
 (*md
@@ -683,12 +636,12 @@ End Continuity.
 - The Mathematical Components book (Assia Mahboubi & Enrico Tassi) is the canonical
   reference for the proof style used throughout.
 
-- The MathComp School lessons & exercises (`lesson1.v` ... `lesson8.v`) drill
+- The MathComp School lessons & exercises (`lesson1.v` ... `lesson8.v`):
   ssreflect, arithmetic, finite types, big operators, algebra, polynomials,
   matrices, and reflection-based automation.
   https://mathcomp-schools.gitlabpages.inria.fr/2022-12-school/school
 
-- For analysis, the mathcomp-analysis manual and its `theories/` files.
+- For analysis, the mathcomp-analysis documentation and its `theories/` files.
 
 - Reflexes worth building: `Search` before you reprove anything, read a lemma
   with `About`. `rewrite /def` to generally not a good idea, use lemmas!

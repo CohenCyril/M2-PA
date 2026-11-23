@@ -16,10 +16,10 @@ when a shorter combined script exists: the goal is to see the state change
 after every tactic, not to be concise.
 
 What you need installed (via opam, in one switch):
-- rocq-core 9.1.1            (the kernel + the SSReflect proof language)
-- rocq-stdlib 9.0.0          (the Rocq "standard library")
-- mathcomp                   (rocq-mathcomp-ssreflect, -algebra, -field)
-- mathcomp-analysis          (rocq-mathcomp-analysis, -classical)
+- rocq-core 9.2.0            (the kernel + the SSReflect proof language)
+- rocq-stdlib 9.1.0          (the Rocq "standard library")
+- mathcomp 2.6.0             (rocq-mathcomp-ssreflect, -algebra, -field)
+- mathcomp-analysis 1.19.0   (rocq-mathcomp-analysis, -classical)
 *)
 
 (**md
